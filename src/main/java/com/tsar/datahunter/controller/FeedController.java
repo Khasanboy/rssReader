@@ -22,16 +22,17 @@ public class FeedController {
 	
 	@RequestMapping("/")
 	public List<Feed> readFeed(){
-		
-		 System.out.println(feedService.getAllFeeds());
+		 logger.debug("--get all feeds request accepted--");
+		 
 		 return feedService.getAllFeeds();
 		
 	}
 	
 	@RequestMapping("/last10")
 	public List<Feed> getLastTen(){
-		System.out.println(feedService.getLastTen());
-		return feedService.getLastTen();
+		logger.debug("--get last 10 request accepted --");
+		//return feedService.getLastTen();
+		return feedService.getLastTenWithStream();
 	}
 
 }

@@ -24,4 +24,6 @@ public interface FeedService {
 	
 	public boolean isNew(Feed feed);
 
+	List<Feed> getLastTenWithStream();
+
 }

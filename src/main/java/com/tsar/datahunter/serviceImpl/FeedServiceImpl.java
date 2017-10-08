@@ -4,9 +4,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -18,6 +20,8 @@ import com.tsar.datahunter.service.FeedService;
 
 @Service
 public class FeedServiceImpl implements FeedService {
+	
+	private static Logger logger = LoggerFactory.getLogger(FeedService.class);
 
 	@Autowired
 	FeedRepository feedRepository;
@@ -27,8 +31,6 @@ public class FeedServiceImpl implements FeedService {
 		return feedRepository.findAll();
 	}
 	
-	
-
 	@Override
 	public Feed getFeed(Long id) {
 		return feedRepository.findOne(id);
@@ -60,17 +62,12 @@ public class FeedServiceImpl implements FeedService {
 			SyndFeedInput input = new SyndFeedInput();
 			SyndFeed feed = input.build(new XmlReader(feedUrl));
 
-			for (SyndEntry entry : (List<SyndEntry>) feed.getEntries()) {
-				System.out.println("Title: " + entry.getTitle());
-				System.out.println("Description "+entry.getDescription().getValue());
-				System.out.println("Published date: "+entry.getPublishedDate());
-				System.out.println("Unique Identifier: " + entry.getUri());
-				
+			for (SyndEntry entry : (List<SyndEntry>) feed.getEntries()) {				
 				Feed newFeed = new Feed(entry.getTitle(),entry.getDescription().getValue(), entry.getPublishedDate(), entry.getUri());
 				feeds.add(newFeed);
 			}
 		} catch (Exception ex) {
-			System.out.println("Error: " + ex.getMessage());
+			logger.error("Error: " + ex.getMessage());
 		}
 		
 		return feeds;
@@ -79,6 +76,7 @@ public class FeedServiceImpl implements FeedService {
 
 	@Override
 	public Feed editFeed(Feed feed) {
+		feed.setTitle(feed.getTitle().toUpperCase());
 		feed.setSavedToDb(new Date());
 		return feed;
 	}
@@ -92,11 +90,22 @@ public class FeedServiceImpl implements FeedService {
 	}
 
 
-
+	
+	//This function returns last 10 items but not in correct order. If we want we can built new list from this one in correct oreder and return
 	@Override
 	public List<Feed> getLastTen() {
-		 //return feedRepository.findAll((new PageRequest(0, 10, Direction.DESC, "id")));
+		 
 		return feedRepository.findFirst10ByOrderByIdDesc();
+	}
+	
+	@Override
+	public List<Feed> getLastTenWithStream(){
+		long count = feedRepository.count();
+		List<Feed> list = feedRepository.findAll().stream()
+				.filter(feed->feed.getId()>count-10)
+				.collect(Collectors.toList());
+
+		return list;
 	}
 	
 	
