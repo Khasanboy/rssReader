@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -22,9 +23,13 @@ public class ScheduledTasks {
 	
 	SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
 	
+	//Url is defined in the application.properties file
+	@Value("${url}")
+	String url;
+	
 	@Scheduled(fixedRate = 30000)//Every 30 seconds
 	public void scheduleTasksWithFixedRate(){
-		List<Feed> feeds = feedService.readFeed("http://feeds.bbci.co.uk/news/world/rss.xml");
+		List<Feed> feeds = feedService.readFeed(url);
 		
 		for(Feed feed:feeds){
 			
