@@ -26,4 +26,6 @@ public interface FeedService {
 
 	List<Feed> getLastTenWithStream();
 
+	void deleteAll();
+
 }

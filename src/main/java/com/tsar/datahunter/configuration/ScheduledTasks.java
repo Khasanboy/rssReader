@@ -29,7 +29,7 @@ public class ScheduledTasks {
 	
 	@Scheduled(fixedRate = 30000)//Every 30 seconds
 	public void scheduleTasksWithFixedRate(){
-		List<Feed> feeds = feedService.readFeed(url);
+		List<Feed> feeds = feedService.readFeed("http://feeds.bbci.co.uk/news/world/rss.xml");
 		
 		for(Feed feed:feeds){
 			

@@ -50,6 +50,11 @@ public class FeedServiceImpl implements FeedService {
 	public void deleteFeed(Long id) {
 		feedRepository.delete(id);
 	}
+	
+	@Override
+	public void deleteAll(){
+		feedRepository.deleteAll();
+	}
 
 	@Override
 	public List<Feed> readFeed(String url) {
@@ -100,12 +105,8 @@ public class FeedServiceImpl implements FeedService {
 	
 	@Override
 	public List<Feed> getLastTenWithStream(){
-		long count = feedRepository.count();
-		List<Feed> list = feedRepository.findAll().stream()
-				.filter(feed->feed.getId()>count-10)
+		return feedRepository.findAll().stream().skip(Math.max(0, feedRepository.findAll().size() - 10))
 				.collect(Collectors.toList());
-
-		return list;
 	}
 	
 	
